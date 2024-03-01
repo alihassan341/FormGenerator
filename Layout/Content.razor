@@ -1,0 +1,293 @@
+﻿@page "/"
+
+<div class="d-flex h-100 w-100">
+    @* sidebar start *@
+    <div class="left-menu w-16 overflow-auto h-100">
+        <div class="accordion w-100" id="defaultAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <span class="accordion-button m-0 f-s-13" data-bs-toggle="collapse"
+                          data-bs-target="#defaultField" aria-expanded="true" aria-controls="collapseOne">
+                        Default Fields
+                    </span>
+                </h2>
+                <div class="accordion-collapse collapse show text-center pt-2 pb-2" id="defaultField"
+                     data-bs-parent="#defaultAccordion">
+                    @foreach (var obj in defautBtn)
+                    {
+@*                         @onclick
+= "(() => CreateElement(obj.Name))" *@
+                        <button class="btn btn-outline-secondary basic-buttons m-1">
+
+                            <i class="@obj.Icon"></i>
+                            @obj.Name
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion w-100" id="basicAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <span class="accordion-button m-0 f-s-13" data-bs-toggle="collapse"
+                          data-bs-target="#basicField" aria-expanded="true" aria-controls="collapseOne">
+                        Basic Fields
+                    </span>
+                </h2>
+                <div class="accordion-collapse collapse show text-center pt-2 pb-2" id="basicField"
+                     data-bs-parent="#basicAccordion">
+                    @foreach (var obj in basicBtns)
+                    {
+@*                         @onclick
+= "(() => CreateElement(obj.Name))" *@
+                        <button class="btn btn-outline-secondary btn-sm m-1">
+                            <i class="@obj.Icon"></i>
+                            @obj.Name
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="accordion" id="containerAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <span class="accordion-button m-0 f-s-13" data-bs-toggle="collapse"
+                          data-bs-target="#containerFields" aria-expanded="true" aria-controls="collapseOne">
+                        Container
+                    </span>
+                </h2>
+                <div class="accordion-collapse collapse show text-center pt-2 pb-2" id="containerFields"
+                     data-bs-parent="#containerAccordion">
+                    @foreach (var obj in containerBtns)
+                    {
+                        <button class="btn btn-outline-secondary btn-sm m-1">
+                            <i class="@obj.Icon"></i>
+                            @obj.Name
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @* sidebar end *@
+
+    @* content start *@
+    <div class="content w-64 p-0 overflow-auto">
+    <div class="row d-flex align-items-center border-b-black p-2 w-100">
+        <div class="col-md-4 f-s-12">
+            @* <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Popover title" data-bs-content="Testing Popover">
+            </button> *@
+            <i class="fa-solid fa-brush text-light mx-1 pointer" @onclick="AllRemove"></i>
+            <i class="fa-brands fa-squarespace text-light pointer"></i>
+            <span class="mx-2 mb-0 text-danger">Layout: 2</span>
+        </div>
+
+        <div class="col-md-4 text-center">
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-info btn-sm" @onclick="(() => setDisplay(true))">
+                    <i class="fa-solid fa-desktop"></i>
+                </button>
+                <button class="btn btn-outline-light btn-sm" @onclick="() => setDisplay(false)">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4 f-s-12 text-end">
+            <span class="mx-2 mb-0 text-info">Generate JSON</span>
+            <i class="fa-solid fa-font text-light mx-1 pointer"></i>
+            <i class="fa-regular fa-eye text-light pointer"></i>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="@displayClasses" id="contentBody">
+
+    </div>
+    </div>
+</div>
+    @* content end *@
+
+    @*setting start *@
+    <div class="setting w-20">
+        <div class="row w-100 f-s-12 px-3 pt-2 pb-2 text-white">
+            <span>Form Attribute</span>
+
+            <div class="row w-100 mt-4">
+                <span>Synchronize computer and mobile configurations</span>
+                <div class="form-check form-switch mt-2 mx-3">
+                    <input class="form-check-input radio-toggle" type="checkbox" id="toggleSlider">
+                    <label class="form-check-label" for="toggleSlider"></label>
+                    @* role="switch" *@
+                </div>
+            </div>
+            <div class="row w-100 mt-4 text-start ">
+                <span class="">Size Of Field</span>
+                <div class="btn-group col-md-12" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
+                    <label class="btn btn-sm btn-outline-primary" for="btnradio1">Large</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+                    <label class="btn btn-sm btn-outline-primary" for="btnradio2">Default</label>
+
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                    <label class="btn btn-sm btn-outline-primary" for="btnradio3">Small</label>
+                </div>
+            </div>
+            <div class="row w-100 mt-4">
+                <span>label Alignment</span>
+                <div class="col-md-4 p-0">
+                    <img src="~/_content/FormGenerator/images/no-img.png" alt="No Image" class="w-img">
+                </div>
+                <div class="col-md-4 p-0">
+                    <img src="no-img.png" alt="No Image" class="w-img">
+                </div>
+                <div class="col-md-4 p-0">
+                    <img src="no-img.png" alt="No Image" class="w-img">
+                </div>
+            </div>
+            <div class="button-div mt-3 mx-2">
+                <span>Button</span>
+                <div class="text-center mt-2">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+            <div class="text-container mt-3 mx-2">
+                <span>Text</span>
+                <input class="form-control form-control-sm" type="text" placeholder="Place Holder">
+            </div>
+            <div class="row w-100 mt-4 mx-2">
+                <div class="col-md-6">
+                    <p for="color" class="m-0">Color:</p>
+                    <input type="color" id="color" name="color" value="#4797dd">
+                </div>
+                <div class="col-md-6">
+                    <p for="backColor" class="m-0">Background:</p>
+                    <input type="color" id="backColor" name="backColor" value="#4797dd">
+                </div>
+            </div>
+            <button type="button" class="btn btn-light mt-4 mx-3">Logic Control</button>
+        </div>
+
+    </div>
+    @*setting end *@
+</div>
+
+
+
+@code{
+
+    // content start
+
+    [Parameter]
+    public string ElementName { get; set; } = "";
+
+    private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
+
+    private bool showEmailInput = false;
+    private bool showRegionInput = false;
+    private bool showCellphoneInput = false;
+    private bool showURLInput = false;
+    private bool showIdInput = false;
+    private bool showCheckInput = false;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        switch (ElementName)
+        {
+            case "Email":
+                showEmailInput = true;
+                break;
+            case "Region":
+                showRegionInput = true;
+                break;
+            case "Phone":
+                showCellphoneInput = true;
+                break;
+            case "URL":
+                showURLInput = true;
+                break;
+            case "Id":
+                showIdInput = true;
+                break;
+            case "Checkbox":
+                showCheckInput = true;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void AllRemove()
+    {
+        showEmailInput = false;
+        showRegionInput = false;
+        showCellphoneInput = false;
+        showURLInput = false;
+        showIdInput = false;
+    }
+
+    private void setDisplay(bool display)
+    {
+        if (display)
+        {
+            displayClasses = "h-88vh mt-3 overflow-auto w-100";
+        }
+        else
+        {
+            displayClasses = "h-88vh mt-3 overflow-auto w-50";
+        }
+    }
+
+    // content end 
+
+    // sidebar start
+
+    List<buttonCls> containerBtns = new List<buttonCls>
+    {
+        new buttonCls { Icon = "fa fa-envelope-o", Name = "Grid" },
+        new buttonCls { Icon = "fa fa-phone-square", Name = "Table" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "Tabs" },
+        new buttonCls { Icon = "fa fa-location-arrow", Name = "Divider" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Sub-form" },
+    };
+
+    List<buttonCls> basicBtns = new List<buttonCls>
+    {
+        new buttonCls { Icon = "fa fa-envelope-o", Name = "Input" },
+        new buttonCls { Icon = "fa fa-phone-square", Name = "TextArea" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "Number" },
+        new buttonCls { Icon = "fa fa-location-arrow", Name = "Radio" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Checkbox" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Select" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Time" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Date" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Rate" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "Switch" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "Slider" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "Html" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "Cascader" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "File" },
+    };
+
+    private List<buttonCls> defautBtn = new List<buttonCls>
+    {
+        new buttonCls { Icon = "fa fa-envelope-o", Name = "Email" },
+        new buttonCls { Icon = "fa fa-phone-square", Name = "Phone" },
+        new buttonCls { Icon = "fa fa-pencil", Name = "URL" },
+        new buttonCls { Icon = "fa fa-location-arrow", Name = "Region" },
+        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Id" }
+    };
+
+    private class buttonCls
+    {
+        public string? Icon { get; set; }
+        public string? Name { get; set; }
+    };
+
+    // sidebar end
+}
