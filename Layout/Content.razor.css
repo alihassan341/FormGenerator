@@ -103,3 +103,22 @@
 }
 
 /* setting end */
+
+.selected {
+    margin-bottom: 6px !important;
+    border: 2px solid lightblue !important;
+    border-style: dashed !important;
+}
+
+.resize-handle {
+    resize: horizontal;
+    overflow: hidden;
+    min-width: 10%;
+    max-width: 97%;
+    /*    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;*/
+    cursor: ew-resize;
+    /*    background-color: #ddd*/;
+}

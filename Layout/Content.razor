@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
 
 <div class="d-flex h-100 w-100">
     @* sidebar start *@
@@ -15,9 +17,7 @@
                      data-bs-parent="#defaultAccordion">
                     @foreach (var obj in defautBtn)
                     {
-@*                         @onclick
-= "(() => CreateElement(obj.Name))" *@
-                        <button class="btn btn-outline-secondary basic-buttons m-1">
+                        <button class="btn btn-outline-secondary basic-buttons m-1" @onclick="(() => CreateElement(obj.Name))">
 
                             <i class="@obj.Icon"></i>
                             @obj.Name
@@ -104,7 +104,34 @@
     <div class="d-flex justify-content-center">
         <div class="@displayClasses" id="contentBody">
 
-    </div>
+
+                @foreach (var field in fields)
+                {
+                    <div style="width: @inputWidth;touch-action :none;user-select = none" draggable="true">
+                    <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))" >
+                        <label for="@field.Id">@field.Name :</label>
+                            <input  type="@field.Type" class="form-control form-control-sm" id="@field.Id" @bind="field.Value"/>
+                            @* draggable="true" @ondragstart="DragStart" @ondragover="DragOver" @ondrop="Drop" @ref="inputElement"*@
+                        @if (field.Actions)
+                        {
+                            <div class="d-flex align-items-ceneter justify-content-end pt-2">
+                                @* <button type="button" class="btn btn-outline-light btn-sm">
+                                    <i class="fa-solid fa-grip"></i>
+                                </button> *@
+                                @* //<button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateField(field.Id))"> *@
+                                    <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                       
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
+                                    <i class="fa-solid fa-square-minus"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                    </div>
+                }
+        </div>
     </div>
 </div>
     @* content end *@
@@ -174,62 +201,10 @@
     @*setting end *@
 </div>
 
-
-
 @code{
-
     // content start
 
-    [Parameter]
-    public string ElementName { get; set; } = "";
-
     private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
-
-    private bool showEmailInput = false;
-    private bool showRegionInput = false;
-    private bool showCellphoneInput = false;
-    private bool showURLInput = false;
-    private bool showIdInput = false;
-    private bool showCheckInput = false;
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-
-        switch (ElementName)
-        {
-            case "Email":
-                showEmailInput = true;
-                break;
-            case "Region":
-                showRegionInput = true;
-                break;
-            case "Phone":
-                showCellphoneInput = true;
-                break;
-            case "URL":
-                showURLInput = true;
-                break;
-            case "Id":
-                showIdInput = true;
-                break;
-            case "Checkbox":
-                showCheckInput = true;
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    private void AllRemove()
-    {
-        showEmailInput = false;
-        showRegionInput = false;
-        showCellphoneInput = false;
-        showURLInput = false;
-        showIdInput = false;
-    }
 
     private void setDisplay(bool display)
     {
@@ -243,9 +218,88 @@
         }
     }
 
+    private void AllRemove()
+    {
+        fields.Clear();
+    }
+
     // content end 
 
     // sidebar start
+
+    private void onAction(string currentId)
+    {
+        var currentObj = fields.FirstOrDefault(o => o.Id == currentId);
+        if (!currentObj.Class.Contains("selected"))
+        {
+            currentObj.Class = "selected p-2 form-group";
+            currentObj.Actions = true;
+        }
+        else
+        {
+            currentObj.Class = "p-2 form-group mb-2";
+            currentObj.Actions = false;
+        }
+    }
+
+    private void OnRemove(string currentId)
+    {
+        var rowId = fields.FirstOrDefault(x => x.Id == currentId);
+        if (rowId != null)
+        {
+            fields.Remove(rowId);
+        }
+    }
+
+    private void DuplicateField(string currentId)
+    {
+        var currentObj = fields.FirstOrDefault(x => x.Id == currentId);        
+        fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = "Email", Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com" });
+    }
+
+    public class InputModel
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Value { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Class { get; set; } = "";
+        public bool Actions { get; set; } = true;
+
+    }
+
+    private List<InputModel> fields = new List<InputModel>();
+
+    private int inputFieldCount = 1;
+
+    private void CreateElement(string? elementName)
+    {
+        if (elementName != null)
+        {
+            switch (elementName)
+            {
+                case "Email":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com" });
+                    break;
+                case "Phone":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "Phone", Actions = false, Value = "abc.123@gmail.com" });
+                    break;
+
+                case "URL":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "URL", Actions = false, Value = "abc.123@gmail.com" });
+                    break;
+                case "Region":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "Region", Actions = false, Value = "abc.123@gmail.com" });
+                    break;
+
+                case "Id":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "Id", Actions = false, Value = "abc.123@gmail.com" });
+
+                    break;
+
+            }
+        }
+    }
 
     List<buttonCls> containerBtns = new List<buttonCls>
     {
@@ -288,6 +342,44 @@
         public string? Icon { get; set; }
         public string? Name { get; set; }
     };
+
+    private string inputWidth = "100%";
+
+    private void UpdateWidth(MouseEventArgs e)
+    {
+        inputWidth = $"{e.ClientX}%";
+    }
+
+    //private ElementReference inputElement;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("dragAndDrop", ".draggable");
+    }
+
+    // private void DragStart(DragEventArgs e)
+    // {
+    //     // Set the data that will be transferred during the drag operation
+    //     e.DataTransfer.SetData("text/plain", "This is the dragged text");
+    // }
+
+    // private void DragOver(DragEventArgs e)
+    // {
+    //     // Prevent default to allow drop
+    //     e.PreventDefault();
+    // }
+
+    // private async Task Drop(DragEventArgs e)
+    // {
+    //     // Prevent default to allow drop
+    //     e.PreventDefault();
+
+    //     // Get the data that was set during the drag operation
+    //     string data = await e.DataTransfer.GetDataAsync("text/plain");
+
+    //     // Update the input value with the dropped data
+    //     await JSRuntime.InvokeVoidAsync("setInputValue", inputElement, data);
+    // }
 
     // sidebar end
 }
