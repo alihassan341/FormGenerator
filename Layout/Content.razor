@@ -83,7 +83,7 @@
             <i class="fa-brands fa-squarespace text-light pointer"></i>
             <span class="mx-2 mb-0 text-danger">Layout: 2</span>
         </div>
-
+        
         <div class="col-md-4 text-center">
             <div class="btn-group" role="group">
                 <button class="btn btn-outline-info btn-sm" @onclick="(() => setDisplay(true))">
@@ -107,7 +107,8 @@
 
                 @foreach (var field in fields)
                 {
-                    <div style="width: @inputWidth;touch-action :none;user-select = none" draggable="true">
+                    <div style="width: @inputWidth;touch-action :none;user-select = none" draggable="true" @ref="draggableElement">
+                        
                     <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))" >
                         <label for="@field.Id">@field.Name :</label>
                             <input  type="@field.Type" class="form-control form-control-sm" id="@field.Id" @bind="field.Value"/>
@@ -115,9 +116,9 @@
                         @if (field.Actions)
                         {
                             <div class="d-flex align-items-ceneter justify-content-end pt-2">
-                                @* <button type="button" class="btn btn-outline-light btn-sm">
+                                    <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                     <i class="fa-solid fa-grip"></i>
-                                </button> *@
+                                </button>
                                 @* //<button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateField(field.Id))"> *@
                                     <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
                                        
@@ -344,6 +345,12 @@
         public string? Name { get; set; }
     };
 
+    private ElementReference draggableElement;
+    private async void DragDrop ( )
+    {
+        await JSRuntime.InvokeVoidAsync("initializeDragAndDrop", draggableElement);
+    }
+
     private string inputWidth = "100%";
 
     private void UpdateWidth(MouseEventArgs e)
@@ -351,36 +358,4 @@
         inputWidth = $"{e.ClientX}%";
     }
 
-    //private ElementReference inputElement;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JSRuntime.InvokeVoidAsync("dragAndDrop", ".draggable");
-    }
-
-    // private void DragStart(DragEventArgs e)
-    // {
-    //     // Set the data that will be transferred during the drag operation
-    //     e.DataTransfer.SetData("text/plain", "This is the dragged text");
-    // }
-
-    // private void DragOver(DragEventArgs e)
-    // {
-    //     // Prevent default to allow drop
-    //     e.PreventDefault();
-    // }
-
-    // private async Task Drop(DragEventArgs e)
-    // {
-    //     // Prevent default to allow drop
-    //     e.PreventDefault();
-
-    //     // Get the data that was set during the drag operation
-    //     string data = await e.DataTransfer.GetDataAsync("text/plain");
-
-    //     // Update the input value with the dropped data
-    //     await JSRuntime.InvokeVoidAsync("setInputValue", inputElement, data);
-    // }
-
-    // sidebar end
 }
