@@ -41,7 +41,7 @@
                     {
 @*                         @onclick
 = "(() => CreateElement(obj.Name))" *@
-                        <button class="btn btn-outline-secondary btn-sm m-1">
+                        <button class="btn btn-outline-secondary btn-sm m-1" @onclick="(() => CreateElement(obj.Name))">
                             <i class="@obj.Icon"></i>
                             @obj.Name
                         </button>
@@ -111,17 +111,14 @@
                         
                     <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))" >
                         <label for="@field.Id">@field.Name :</label>
-                            <input  type="@field.Type" class="form-control form-control-sm" id="@field.Id" @bind="field.Value"/>
-                            @* draggable="true" @ondragstart="DragStart" @ondragover="DragOver" @ondrop="Drop" @ref="inputElement"*@
+                            <input type="@field.Type" class="form-control form-control-sm" id="@field.Id" @bind="field.Value"/>
                         @if (field.Actions)
                         {
                             <div class="d-flex align-items-ceneter justify-content-end pt-2">
                                     <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                     <i class="fa-solid fa-grip"></i>
                                 </button>
-                                @* //<button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateField(field.Id))"> *@
                                     <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
-                                       
                                     <i class="fa-solid fa-copy"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -139,6 +136,8 @@
 
     @*setting start *@
     <div class="setting w-20">
+        @if (!IsSelect)
+        {   
         <div class="row w-100 f-s-12 px-3 pt-2 pb-2 text-white">
             <span>Form Attribute</span>
 
@@ -197,13 +196,27 @@
             </div>
             <button type="button" class="btn btn-light mt-4 mx-3">Logic Control</button>
         </div>
+        }
+        
+        @if (IsSelect)
+        {
+            
+        <div class="fields-panel">
 
+            <div>
+                <label for="Id" required="true">Id</label>
+                <input type="number" id="Id"/>
+            </div>
+        </div>
+        }
     </div>
     @*setting end *@
 </div>
 
 @code{
     // content start
+
+    private bool IsSelect = false;
 
     private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
 
@@ -235,11 +248,13 @@
         {
             currentObj.Class = "selected p-2 form-group";
             currentObj.Actions = true;
+            IsSelect = true;
         }
         else
         {
             currentObj.Class = "p-2 form-group mb-2";
             currentObj.Actions = false;
+            IsSelect = false;
         }
     }
 
@@ -284,21 +299,26 @@
                     fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com" });
                     break;
                 case "Phone":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "Phone", Actions = false, Value = "abc.123@gmail.com" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876" });
                     break;
-
                 case "URL":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "URL", Actions = false, Value = "abc.123@gmail.com" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com" });
                     break;
                 case "Region":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "Region", Actions = false, Value = "abc.123@gmail.com" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam" });
                     break;
-
                 case "Id":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "Id", Actions = false, Value = "abc.123@gmail.com" });
-
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001" });
                     break;
-
+                case "Input":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type..." });
+                    break;
+                case "Number":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000" });
+                    break;
+                case "Radio":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "" });
+                    break;
             }
         }
     }
