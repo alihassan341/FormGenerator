@@ -1,9 +1,9 @@
 ﻿@page "/"
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
+@using FormGenerator.Model
 
 <div class="d-flex h-100 w-100">
-    @* sidebar start *@
     <div class="left-menu w-16 overflow-auto h-100">
         <div class="accordion w-100" id="defaultAccordion">
             <div class="accordion-item">
@@ -18,7 +18,6 @@
                     @foreach (var obj in defautBtn)
                     {
                         <button class="btn btn-outline-secondary basic-buttons m-1" @onclick="(() => CreateElement(obj.Name))">
-
                             <i class="@obj.Icon"></i>
                             @obj.Name
                         </button>
@@ -39,9 +38,7 @@
                      data-bs-parent="#basicAccordion">
                     @foreach (var obj in basicBtns)
                     {
-@*                         @onclick
-= "(() => CreateElement(obj.Name))" *@
-                        <button class="btn btn-outline-secondary btn-sm m-1" @onclick="(() => CreateElement(obj.Name))">
+                        <button class="btn btn-outline-secondary basic-buttons m-1" @onclick="(() => CreateElement(obj.Name))">
                             <i class="@obj.Icon"></i>
                             @obj.Name
                         </button>
@@ -71,14 +68,10 @@
             </div>
         </div>
     </div>
-    @* sidebar end *@
 
-    @* content start *@
     <div class="content w-64 p-0 overflow-auto">
-    <div class="row d-flex align-items-center border-b-black p-2 w-100">
+      <div class="row d-flex align-items-center border-b-black p-2 w-100">
         <div class="col-md-4 f-s-12">
-            @* <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Popover title" data-bs-content="Testing Popover">
-            </button> *@
             <i class="fa-solid fa-brush text-light mx-1 pointer" @onclick="AllRemove"></i>
             <i class="fa-brands fa-squarespace text-light pointer"></i>
             <span class="mx-2 mb-0 text-danger">Layout: 2</span>
@@ -104,13 +97,13 @@
     <div class="d-flex justify-content-center">
         <div class="@displayClasses" id="contentBody">
 
-
                 @foreach (var field in fields)
                 {
-                    <div style="width: @inputWidth;touch-action :none;user-select = none" draggable="true" @ref="draggableElement">
-                        
-                    <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))" >
-                        <label for="@field.Id">@field.Name :</label>
+                    @if(field.FieldType == "input")
+                    {
+                    <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                        <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))" >
+                            <label for="@field.Id">@field.Name :</label>
                             <input type="@field.Type" class="form-control form-control-sm" id="@field.Id" @bind="field.Value"/>
                         @if (field.Actions)
                         {
@@ -126,21 +119,66 @@
                                 </button>
                             </div>
                         }
-                    </div>
-                    </div>
+                           </div>
+                        </div>
+                    }
+                    else if (field.FieldType == "radio")
+                    {
+                        <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
+                                <input type="@field.Type" id="@field.Id" @bind="field.Value">
+                                <label for="@field.Id">@field.Name</label>
+                                @if (field.Actions)
+                                {
+                                    <div class="d-flex align-items-ceneter justify-content-end pt-2">
+                                        <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
+                                            <i class="fa-solid fa-grip"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
+                                            <i class="fa-solid fa-square-minus"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (field.FieldType == "checkbox")
+                    {
+                        <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
+                                <input class="form-check-input" type="@field.Type" @bind="field.Value" id="@field.Id">
+                                <label class="form-check-label" for="@field.Id">@field.Name</label>
+                                @if (field.Actions)
+                                {
+                                    <div class="d-flex align-items-ceneter justify-content-end pt-2">
+                                        <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
+                                            <i class="fa-solid fa-grip"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
+                                            <i class="fa-solid fa-square-minus"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
                 }
         </div>
     </div>
 </div>
-    @* content end *@
 
-    @*setting start *@
     <div class="setting w-20">
-        @if (!IsSelect)
-        {   
         <div class="row w-100 f-s-12 px-3 pt-2 pb-2 text-white">
             <span>Form Attribute</span>
-
+            @if (!IsSelect)
+            {
+            <div>
             <div class="row w-100 mt-4">
                 <span>Synchronize computer and mobile configurations</span>
                 <div class="form-check form-switch mt-2 mx-3">
@@ -195,30 +233,71 @@
                 </div>
             </div>
             <button type="button" class="btn btn-light mt-4 mx-3">Logic Control</button>
+                </div>
+            }
+            @if (IsSelect)
+            {
+                <div class="fields-panel pt-3">
+                    <div class="mb-3">
+                        <label for="id" class="form-label">Id</label>
+                        <input type="text" class="form-control form-control-sm" id="id" placeholder="emp:121212">
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Default Content</label>
+                        <input type="text" class="form-control form-control-sm" id="content" placeholder="">
+                    </div>
+                </div>
+            }
         </div>
-        }
-        
-        @if (IsSelect)
-        {
-            
-        <div class="fields-panel">
-
-            <div>
-                <label for="Id" required="true">Id</label>
-                <input type="number" id="Id"/>
-            </div>
-        </div>
-        }
+       
     </div>
-    @*setting end *@
 </div>
 
 @code{
-    // content start
+
+    List<ButtonModel> containerBtns = new List<ButtonModel>
+    {
+        new ButtonModel { Icon = "fa fa-envelope-o", Name = "Grid" },
+        new ButtonModel { Icon = "fa fa-phone-square", Name = "Table" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "Tabs" },
+        new ButtonModel { Icon = "fa fa-location-arrow", Name = "Divider" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Sub-form" },
+    };
+
+    List<ButtonModel> basicBtns = new List<ButtonModel>
+    {
+        new ButtonModel { Icon = "fa fa-envelope-o", Name = "Input" },
+        new ButtonModel { Icon = "fa fa-phone-square", Name = "TextArea" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "Number" },
+        new ButtonModel { Icon = "fa fa-location-arrow", Name = "Radio" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Checkbox" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Select" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Time" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Date" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Rate" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "Switch" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "Slider" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "Html" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "Cascader" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "File" },
+    };
+
+    List<ButtonModel> defautBtn = new List<ButtonModel>
+    {
+        new ButtonModel { Icon = "fa fa-envelope-o", Name = "Email" },
+        new ButtonModel { Icon = "fa fa-phone-square", Name = "Phone" },
+        new ButtonModel { Icon = "fa fa-pencil", Name = "URL" },
+        new ButtonModel { Icon = "fa fa-location-arrow", Name = "Region" },
+        new ButtonModel { Icon = "fa fa-drivers-license-o", Name = "Id" }
+    };
+
+    List<InputModel> fields = new List<InputModel>();
 
     private bool IsSelect = false;
-
+    private ElementReference draggableElement;
     private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
+    private int inputFieldCount = 1;
+    private string inputWidth = "100%";
 
     private void setDisplay(bool display)
     {
@@ -236,10 +315,6 @@
     {
         fields.Clear();
     }
-
-    // content end 
-
-    // sidebar start
 
     private void onAction(string currentId)
     {
@@ -267,28 +342,6 @@
         }
     }
 
-    private void DuplicateField(string currentId)
-    {
-        var currentObj = fields.FirstOrDefault(x => x.Id == currentId);        
-        fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = "Email", Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com" });
-    }
-
-    public class InputModel
-    {
-        public string Id { get; set; } = "";
-        public string Name { get; set; } = "";
-        public string Value { get; set; } = "";
-        public string Type { get; set; } = "";
-        public string Class { get; set; } = "";
-        public bool Actions { get; set; } = true;
-
-    }
-
-
-    private List<InputModel> fields = new List<InputModel>();
-
-    private int inputFieldCount = 1;
-
     private void CreateElement(string? elementName)
     {
         if (elementName != null)
@@ -296,82 +349,40 @@
             switch (elementName)
             {
                 case "Email":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input" });
                     break;
                 case "Phone":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input" });
                     break;
                 case "URL":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input" });
                     break;
                 case "Region":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input" });
                     break;
                 case "Id":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input" });
                     break;
                 case "Input":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type..." });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input" });
                     break;
                 case "Number":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input" });
                     break;
                 case "Radio":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio" });
+                    break;
+                case "Checkbox":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox" });
                     break;
             }
         }
     }
 
-    List<buttonCls> containerBtns = new List<buttonCls>
-    {
-        new buttonCls { Icon = "fa fa-envelope-o", Name = "Grid" },
-        new buttonCls { Icon = "fa fa-phone-square", Name = "Table" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "Tabs" },
-        new buttonCls { Icon = "fa fa-location-arrow", Name = "Divider" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Sub-form" },
-    };
-
-    List<buttonCls> basicBtns = new List<buttonCls>
-    {
-        new buttonCls { Icon = "fa fa-envelope-o", Name = "Input" },
-        new buttonCls { Icon = "fa fa-phone-square", Name = "TextArea" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "Number" },
-        new buttonCls { Icon = "fa fa-location-arrow", Name = "Radio" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Checkbox" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Select" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Time" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Date" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Rate" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "Switch" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "Slider" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "Html" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "Cascader" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "File" },
-    };
-
-    private List<buttonCls> defautBtn = new List<buttonCls>
-    {
-        new buttonCls { Icon = "fa fa-envelope-o", Name = "Email" },
-        new buttonCls { Icon = "fa fa-phone-square", Name = "Phone" },
-        new buttonCls { Icon = "fa fa-pencil", Name = "URL" },
-        new buttonCls { Icon = "fa fa-location-arrow", Name = "Region" },
-        new buttonCls { Icon = "fa fa-drivers-license-o", Name = "Id" }
-    };
-
-    private class buttonCls
-    {
-        public string? Icon { get; set; }
-        public string? Name { get; set; }
-    };
-
-    private ElementReference draggableElement;
     private async void DragDrop ( )
     {
         await JSRuntime.InvokeVoidAsync("initializeDragAndDrop", draggableElement);
     }
-
-    private string inputWidth = "100%";
 
     private void UpdateWidth(MouseEventArgs e)
     {
