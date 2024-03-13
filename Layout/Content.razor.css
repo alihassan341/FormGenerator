@@ -26,10 +26,7 @@
 .left-menu {
     background-color: #efe8e8a1;
     height: 100vh;
-}
-
-.w-16 {
-    width: 16% !important;
+    width: 17% !important;
 }
 
 .h-100 {
@@ -41,8 +38,8 @@
 }
 
 .basic-buttons {
-    width: 85px !important;
-    font-size: 13px !important;
+    width: 90px !important;
+    font-size: 11px !important;
     font-weight: 600;
 }
 
@@ -114,11 +111,6 @@
     resize: horizontal;
     overflow: hidden;
     min-width: 10%;
-    max-width: 97%;
-    /*    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 5px;*/
+    max-width: 100%;
     cursor: ew-resize;
-    /*    background-color: #ddd*/;
 }

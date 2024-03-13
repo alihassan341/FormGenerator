@@ -4,7 +4,7 @@
 @using FormGenerator.Model
 
 <div class="d-flex h-100 w-100">
-    <div class="left-menu w-16 overflow-auto h-100">
+    <div class="left-menu overflow-auto h-100">
         <div class="accordion w-100" id="defaultAccordion">
             <div class="accordion-item">
                 <h2 class="accordion-header">
@@ -168,13 +168,59 @@
                             </div>
                         </div>
                     }
+                    else if (field.FieldType == "textarea")
+                    {
+                        <div style="width: @inputWidth; touch-action :none; user-select = none" draggable="true" @ref="draggableElement">
+                            <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
+                                <label for="@field.Id">@field.Name</label>
+                                <textarea class="form-control" id="@field.Id" rows="3" @bind="@field.Value"></textarea>
+                                @if (field.Actions)
+                                {
+                                    <div class="d-flex align-items-ceneter justify-content-end pt-2">
+                                        <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
+                                            <i class="fa-solid fa-grip"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
+                                            <i class="fa-solid fa-square-minus"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else if (field.FieldType == "time")
+                    {
+                        <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
+                                <label for="@field.Id">@field.Name</label>
+                                <input class="form-control" type="@field.Type" @bind="field.Value" id="@field.Id">
+                                @if (field.Actions)
+                                {
+                                    <div class="d-flex align-items-ceneter justify-content-end pt-2">
+                                        <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
+                                            <i class="fa-solid fa-grip"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
+                                            <i class="fa-solid fa-square-minus"></i>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
                 }
         </div>
     </div>
 </div>
 
     <div class="setting w-20">
-        <div class="row w-100 f-s-12 px-3 pt-2 pb-2 text-white">
+        <div class="w-100 f-s-12 px-3 pt-2 pb-2 text-white">
             <span>Form Attribute</span>
             @if (!IsSelect)
             {
@@ -237,16 +283,28 @@
             }
             @if (IsSelect)
             {
+                @foreach (var item in panelLst)
+                {   
                 <div class="fields-panel pt-3">
                     <div class="mb-3">
-                        <label for="id" class="form-label">Id</label>
-                        <input type="text" class="form-control form-control-sm" id="id" placeholder="emp:121212">
+                        <label for="@item.id" class="form-label">Id</label>
+                            <input type="text" class="form-control form-control-sm" id="@item.id" placeholder="@item.id" @bind="@item.id">
                     </div>
                     <div class="mb-3">
-                        <label for="content" class="form-label">Default Content</label>
-                        <input type="text" class="form-control form-control-sm" id="content" placeholder="">
+                            <label for="@item.title" class="form-label">Title</label>
+                            <input type="text" class="form-control form-control-sm" id="@item.title" placeholder="@item.title" @bind="@item.title">
+                            @* @onchange="(() => UpdateValue(item))" *@
+                    </div>
+                    <div class="mb-3">
+                            <label for="@item.content" class="form-label">Default Content</label>
+                            <input type="text" class="form-control form-control-sm" id="@item.content" placeholder="@item.content">
+                    </div>
+                    <div class="mb-3">
+                            <label for="@item.placeholder" class="form-label">Place Holder</label>
+                            <input type="text" class="form-control form-control-sm" id="@item.placeholder" placeholder="@item.placeholder">
                     </div>
                 </div>
+                }
             }
         </div>
        
@@ -293,6 +351,8 @@
 
     List<InputModel> fields = new List<InputModel>();
 
+    List<Panel> panelLst = new List<Panel>();
+
     private bool IsSelect = false;
     private ElementReference draggableElement;
     private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
@@ -314,6 +374,8 @@
     private void AllRemove()
     {
         fields.Clear();
+        panelLst.Clear();
+        IsSelect = false;
     }
 
     private void onAction(string currentId)
@@ -321,15 +383,17 @@
         var currentObj = fields.FirstOrDefault(o => o.Id == currentId);
         if (!currentObj.Class.Contains("selected"))
         {
-            currentObj.Class = "selected p-2 form-group";
+            currentObj.Class = "selected mx-2 p-2 form-group";
             currentObj.Actions = true;
             IsSelect = true;
+            panelLst.Add(new Panel { id = currentId, title = currentObj.Name, content = currentObj.Value, placeholder = currentObj.Name, clearable = true, disabled = false, required = false, trim = false, width = 100 });
         }
         else
         {
-            currentObj.Class = "p-2 form-group mb-2";
+            currentObj.Class = "p-2 mx-2 form-group mb-2";
             currentObj.Actions = false;
             IsSelect = false;
+            panelLst.Clear();
         }
     }
 
@@ -339,6 +403,12 @@
         if (rowId != null)
         {
             fields.Remove(rowId);
+            var count = panelLst.Count();
+            if (count > 0)
+            {
+                panelLst.Clear();
+                IsSelect = false;
+            }
         }
     }
 
@@ -375,6 +445,15 @@
                 case "Checkbox":
                     fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox" });
                     break;
+                case "TextArea":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea" });
+                    break;
+                case "Time":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "", FieldType = "time" });
+                    break;
+                case "Date":
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "input", Actions = false, Value = "", FieldType = "date" });
+                    break;
             }
         }
     }
@@ -387,6 +466,19 @@
     private void UpdateWidth(MouseEventArgs e)
     {
         inputWidth = $"{e.ClientX}%";
+    }
+
+    private void UpdateValue(object Data)
+    {
+        if (Data != null)
+        {
+            Console.WriteLine(Data);
+            // var selectField = fields.FirstOrDefault(y => y.Class.Contains("selected"));
+            // if (selectField != null)
+            // {
+            //     // selectField.Value = Data.content;   
+            // }
+        }
     }
 
 }
