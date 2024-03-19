@@ -15,10 +15,13 @@ namespace FormGenerator.Model
         public string? FieldType { get; set; } = "";
         public int min { get; set; } = 0;
         public int step { get; set; } = 1;
-        public int max { get; set; } = 100;
+        public int max { get; set; } = 100;       
+    }
 
+    public class JsonCls
+    {
         [JsonPropertyName("type")]
-        public string Types { get; set; } = "input";
+        public string Type { get; set; } = "input";
 
         [JsonPropertyName("label")]
         public string Label { get; set; } = "Cellphone";
@@ -30,7 +33,7 @@ namespace FormGenerator.Model
         public string Key { get; set; } = "input_KwA-nxsnczH0t3OM170V2";
 
         [JsonPropertyName("id")]
-        public string Ids { get; set; } = "KwA-nxsnczH0t3OM170V2";
+        public string Id { get; set; } = "KwA-nxsnczH0t3OM170V2";
 
         [JsonPropertyName("options")]
         public InputOptions Options { get; set; } = new InputOptions();
@@ -42,9 +45,9 @@ namespace FormGenerator.Model
         public class InputOptions
         {
             [JsonPropertyName("clearable")]
-            public bool Clearable { get; set; } = true;
+            public bool Clearable { get; set; } = false;
 
-            [JsonPropertyName("renderType")]
+        [JsonPropertyName("renderType")]
             public int RenderType { get; set; } = 4;
 
             [JsonPropertyName("disabled")]
@@ -62,15 +65,15 @@ namespace FormGenerator.Model
             [JsonPropertyName("labelWidth")]
             public int LabelWidth { get; set; } = 105;
 
-            [JsonPropertyName("isShowLabel")]
-            public bool IsShowLabel { get; set; } = true;
+        [JsonPropertyName("isShowLabel")]
+            public bool IsShowLabel { get; set; } = false;            
 
             [JsonPropertyName("required")]
-            public bool Required { get; set; } = true;
+            public bool Required { get; set; } = false;
 
-            [JsonPropertyName("isShowTrim")]
-            public bool IsShowTrim { get; set; } = true;
-        }
+        [JsonPropertyName("isShowTrim")]
+            public bool IsShowTrim { get; set; } = false;
+    }
 
         public class InputStyle
         {
