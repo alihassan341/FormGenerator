@@ -2,6 +2,8 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 @using FormGenerator.Model
+@using System.Text.Json
+
 
 <div class="d-flex h-100 w-100">
     <div class="left-menu overflow-auto h-100">
@@ -88,15 +90,18 @@
             </div>
         </div>
 
-        <div class="col-md-4 f-s-12 text-end">
-            <span class="mx-2 mb-0 text-info">Generate JSON</span>
+        <div class="col-md-4 f-s-12 text-end">             
+                <button class=" mx-2 mb-0 text-info" @onclick="GenerateJson">
+                      <span class="mx-2 mb-0 text-info"Generate JSON</span>
+                </button>
+
             <i class="fa-solid fa-font text-light mx-1 pointer"></i>
             <i class="fa-regular fa-eye text-light pointer"></i>
         </div>
     </div>
     <div class="d-flex justify-content-center">
         <div class="@displayClasses" id="contentBody">
-
+                <p>@JsonData</p>
                 @foreach (var field in fields)
                 {
                     @if(field.FieldType == "input")
@@ -522,11 +527,11 @@
     {
         if (display)
         {
-            displayClasses = "h-88vh mt-3 overflow-auto w-100";
+    displayClasses = "h-88vh mt-3 overflow-auto w-100";
         }
         else
         {
-            displayClasses = "h-88vh mt-3 overflow-auto w-50";
+    displayClasses = "h-88vh mt-3 overflow-auto w-50";
         }
     }
 
@@ -542,17 +547,17 @@
         var currentObj = fields.FirstOrDefault(o => o.Id == currentId);
         if (!currentObj.Class.Contains("selected"))
         {
-            currentObj.Class = "selected mx-2 p-2 form-group";
-            currentObj.Actions = true;
-            IsSelect = true;
-            panelLst.Add(new Panel { id = currentId, title = currentObj.Name, content = currentObj.Value, placeholder = currentObj.Name, clearable = true, disabled = false, required = false, trim = false, width = 100 });
+    currentObj.Class = "selected mx-2 p-2 form-group";
+    currentObj.Actions = true;
+    IsSelect = true;
+    panelLst.Add(new Panel { id = currentId, title = currentObj.Name, content = currentObj.Value, placeholder = currentObj.Name, clearable = true, disabled = false, required = false, trim = false, width = 100 });
         }
         else
         {
-            currentObj.Class = "p-2 mx-2 form-group mb-2";
-            currentObj.Actions = false;
-            IsSelect = false;
-            panelLst.Clear();
+    currentObj.Class = "p-2 mx-2 form-group mb-2";
+    currentObj.Actions = false;
+    IsSelect = false;
+    panelLst.Clear();
         }
     }
 
@@ -561,13 +566,13 @@
         var rowId = fields.FirstOrDefault(x => x.Id == currentId);
         if (rowId != null)
         {
-            fields.Remove(rowId);
-            var count = panelLst.Count();
-            if (count > 0)
-            {
-                panelLst.Clear();
-                IsSelect = false;
-            }
+    fields.Remove(rowId);
+    var count = panelLst.Count();
+    if (count > 0)
+    {
+        panelLst.Clear();
+        IsSelect = false;
+    }
         }
     }
 
@@ -575,60 +580,60 @@
     {
         if (elementName != null)
         {
-            switch (elementName)
-            {
-                case "Email":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input" });
-                    break;
-                case "Phone":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input" });
-                    break;
-                case "URL":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input" });
-                    break;
-                case "Region":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input" });
-                    break;
-                case "Id":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input" });
-                    break;
-                case "Input":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input" });
-                    break;
-                case "Number":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input" });
-                    break;
-                case "Radio":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio" });
-                    break;
-                case "Checkbox":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox" });
-                    break;
-                case "TextArea":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea" });
-                    break;
-                case "Time":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "Select Time", FieldType = "time" });
-                    break;
-                case "Date":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "date", Actions = false, Value = "Select Date", FieldType = "date" });
-                    break;                    
-                case "Select":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "select", Actions = false, Value = "Select", FieldType = "select" });
-                    break;
-                case "File":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "file", Actions = false, Value = "Upload a file", FieldType = "file" });
-                    break;
-                case "Rate":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Rate", Actions = false, Value = "", FieldType = "Rate" });
-                    break;
-                case "Switch":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Switch", Actions = false, Value = "", FieldType = "Switch" });
-                    break;
-                    case "Slider":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Slider", Actions = false, Value = "", FieldType = "Slider" });
-                    break;
-            }
+    switch (elementName)
+    {
+        case "Email":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input" });
+            break;
+        case "Phone":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input" });
+            break;
+        case "URL":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input" });
+            break;
+        case "Region":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input" });
+            break;
+        case "Id":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input" });
+            break;
+        case "Input":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input" });
+            break;
+        case "Number":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input" });
+            break;
+        case "Radio":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio" });
+            break;
+        case "Checkbox":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox" });
+            break;
+        case "TextArea":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea" });
+            break;
+        case "Time":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "Select Time", FieldType = "time" });
+            break;
+        case "Date":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "date", Actions = false, Value = "Select Date", FieldType = "date" });
+            break;                    
+        case "Select":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "select", Actions = false, Value = "Select", FieldType = "select" });
+            break;
+        case "File":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "file", Actions = false, Value = "Upload a file", FieldType = "file" });
+            break;
+        case "Rate":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Rate", Actions = false, Value = "", FieldType = "Rate" });
+            break;
+        case "Switch":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Switch", Actions = false, Value = "", FieldType = "Switch" });
+            break;
+        case "Slider":
+            fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Slider", Actions = false, Value = "", FieldType = "Slider" });
+            break;
+    }
         }
     }
 
@@ -647,7 +652,7 @@
         var data = fields.Find(x => x.Class.Contains("selected"));
         if (data != null)
         {
-            data.Name = e.Value.ToString();
+    data.Name = e.Value.ToString();
         }
     }
 
@@ -656,7 +661,7 @@
         var data = fields.Find(x => x.Class.Contains("selected"));
         if (data != null)
         {
-            data.Id = e.Value.ToString();
+    data.Id = e.Value.ToString();
         }
     }
 
@@ -665,8 +670,15 @@
         var data = fields.Find(x => x.Class.Contains("selected"));
         if (data != null)
         {
-            data.Value = e.Value.ToString();
+    data.Value = e.Value.ToString();
         }
+    }
+    public string JsonData { get; set; }
+
+    private void GenerateJson()
+    {
+    var inputField = new InputModel(); // Assuming you have defined the InputField class as shown in the previous example
+        JsonData = JsonSerializer.Serialize(inputField, new JsonSerializerOptions { WriteIndented = true });
     }
 
     // private void UpdatePlaceHolder(ChangeEventArgs e)
