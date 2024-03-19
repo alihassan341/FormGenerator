@@ -15,7 +15,8 @@ namespace FormGenerator.Model
         public string? FieldType { get; set; } = "";
         public int min { get; set; } = 0;
         public int step { get; set; } = 1;
-        public int max { get; set; } = 100;       
+        public int max { get; set; } = 100;
+        public string? DivClass { get; set; } = "";
     }
 
     public class JsonCls

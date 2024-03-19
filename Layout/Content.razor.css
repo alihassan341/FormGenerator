@@ -117,3 +117,25 @@
     max-width: 100%;
     cursor: ew-resize;
 }
+
+.modal_body {
+    height: calc(100vh - 200px);
+    overflow: auto;
+}
+
+.label-align {
+    display: flex !important;
+}
+
+    .label-align input {
+        width: 80px !important;
+    }
+
+.label-center {
+    display: flex !important;
+    text-align: center !important;
+}
+
+    .label-center input {
+        width: 80px !important;
+    }

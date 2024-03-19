@@ -1,26 +1,4 @@
-﻿
-
-//function dragAndDrop(classname) {
-//    const position = { x: 0, y: 0 }
-
-//    interact('.draggable').draggable({
-//        listeners: {
-//            start(event) {
-//                console.log(event.type, event.target)
-//            },
-//            move(event) {
-//                position.x += event.dx
-//                position.y += event.dy
-
-//                event.target.style.transform =
-//                    `translate(${position.x}px, ${position.y}px)`
-//            },
-//        }
-//    })
-//}
-
-// wwwroot/_content/{YourProjectName}/interact.js
-window.initializeDragAndDrop = function (element) {
+﻿window.initializeDragAndDrop = function (element) {
     interact(element).draggable({
         listeners: {
             start(event) {
@@ -37,4 +15,20 @@ window.initializeDragAndDrop = function (element) {
             },
         },
     });
+};
+
+window.openModal = function () {
+    var myModal = new bootstrap.Modal(document.getElementById('modal'));
+    myModal.show();
+};
+
+window.closeModal = function () {
+    var myModal = new bootstrap.Modal(document.getElementById('modal'));
+    myModal.hide();
+};
+
+window.copyToClipboard = function (text) {
+    if (text) {
+       navigator.clipboard.writeText(text);
+    }
 };

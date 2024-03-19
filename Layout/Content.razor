@@ -4,7 +4,6 @@
 @using FormGenerator.Model
 @using System.Text.Json
 
-
 <div class="d-flex h-100 w-100">
     <div class="left-menu overflow-auto h-100">
         <div class="accordion w-100" id="defaultAccordion">
@@ -75,8 +74,8 @@
       <div class="row d-flex align-items-center border-b-black p-2 w-100">
         <div class="col-md-4 f-s-12">
             <i class="fa-solid fa-brush text-light mx-1 pointer" @onclick="AllRemove"></i>
-            <i class="fa-brands fa-squarespace text-light pointer"></i>
-            <span class="mx-2 mb-0 text-danger">Layout: 2</span>
+@*             <i class="fa-brands fa-squarespace text-light pointer"></i>
+            <span class="mx-2 mb-0 text-danger">Layout: 2</span> *@
         </div>
         
         <div class="col-md-4 text-center">
@@ -90,33 +89,31 @@
             </div>
         </div>
 
-        <div class="col-md-4 f-s-12 text-end">             
-                <button class=" mx-2 mb-0 text-info" @onclick="GenerateJson">
-                      <span class="mx-2 mb-0 text-info"Generate JSON</span>
-                </button>
+        <div class="col-md-4 f-s-12 text-end">
+                <span class="mx-2 mb-0 text-info pointer" @onclick="OpenModal">Generate JSON</span>
 
-            <i class="fa-solid fa-font text-light mx-1 pointer"></i>
-            <i class="fa-regular fa-eye text-light pointer"></i>
+@*             <i class="fa-solid fa-font text-light mx-1 pointer"></i>
+            <i class="fa-regular fa-eye text-light pointer"></i> *@
         </div>
     </div>
     <div class="d-flex justify-content-center">
         <div class="@displayClasses" id="contentBody">
-                <p>@JsonData</p>
                 @foreach (var field in fields)
                 {
                     @if(field.FieldType == "input")
                     {
                     <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
-                        <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))" >
+                            <div style="width: @field.DivClass">
+                            <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                             <label for="@field.Id">@field.Name :</label>
-                            <input type="@field.Type" class="form-control form-control-sm" id="@field.Id" @bind="field.Value"/>
+                            <input type="@field.Type" class="@inputGroupSize" id="@field.Id" @bind="field.Value"/>
                         @if (field.Actions)
                         {
                             <div class="d-flex align-items-ceneter justify-content-end pt-2">
                                     <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                     <i class="fa-solid fa-grip"></i>
                                 </button>
-                                    <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                     <i class="fa-solid fa-copy"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -125,11 +122,13 @@
                             </div>
                         }
                            </div>
+                            </div>
                         </div>
                     }
                     else if (field.FieldType == "radio")
                     {
                         <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <input type="@field.Type" id="@field.Id" @bind="field.Value">
                                 <label for="@field.Id">@field.Name</label>
@@ -139,7 +138,7 @@
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -148,11 +147,13 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
                     else if (field.FieldType == "checkbox")
                     {
                         <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <input class="form-check-input" type="@field.Type" @bind="field.Value" id="@field.Id">
                                 <label class="form-check-label" for="@field.Id">@field.Name</label>
@@ -162,7 +163,7 @@
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -170,22 +171,24 @@
                                         </button>
                                     </div>
                                 }
+                            </div>
                             </div>
                         </div>
                     }
                     else if (field.FieldType == "textarea")
                     {
                         <div style="width: @inputWidth; touch-action :none; user-select = none" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
-                                <textarea class="form-control" id="@field.Id" rows="3" @bind="@field.Value"></textarea>
+                                <textarea class="@inputGroupSize" id="@field.Id" rows="3" @bind="@field.Value"></textarea>
                                 @if (field.Actions)
                                 {
                                     <div class="d-flex align-items-ceneter justify-content-end pt-2">
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -194,21 +197,23 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
-                    else if (field.FieldType == "time" || field.FieldType == "date"@*  || field.FieldType == "select" *@)
+                    else if (field.FieldType == "time" || field.FieldType == "date")
                     {
                         <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
-                                <input class="form-control" type="@field.Type" @bind="field.Value" id="@field.Id">
+                                <input class="@inputGroupSize" type="@field.Type" @bind="field.Value" id="@field.Id">
                                 @if (field.Actions)
                                 {
                                     <div class="d-flex align-items-ceneter justify-content-end pt-2">
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -217,22 +222,23 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
-
                     else if (field.FieldType == "select")
                     {
                         <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
-                                <input class="form-control" type="@field.Type" @bind="field.Value" id="@field.Id">
+                                <input class="@inputGroupSize" type="@field.Type" @bind="field.Value" id="@field.Id">
                                 @if (field.Actions)
                                 {
                                     <div class="d-flex align-items-ceneter justify-content-end pt-2">
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -241,23 +247,23 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
-
                     else if (field.FieldType == "file")
                     {
                         <div style="width: @inputWidth; touch-action: none; user-select: none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
-                                @* <input class="form-control" type="file" @onchange="HandleFileInputChange" id="@field.Id"> *@
-                                <input class="form-control" type="file"  id="@field.Id">
+                                <input class="@inputGroupSize" type="file" id="@field.Id">
                                 @if (field.Actions)
                                 {
                                     <div class="d-flex align-items-ceneter justify-content-end pt-2">
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -266,12 +272,14 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
-
                     else if (field.FieldType == "Rate")
                     {
                         <div style="width: @inputWidth; touch-action: none; user-select: none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
+
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
                                 <div class="rating">
@@ -289,7 +297,7 @@
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -298,12 +306,14 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
-
                     else if (field.FieldType == "Switch")
                     {
                         <div style="width: @inputWidth; touch-action: none; user-select: none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
+
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
                                 <div class="custom-control custom-switch">
@@ -316,7 +326,7 @@
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -325,11 +335,14 @@
                                     </div>
                                 }
                             </div>
+                            </div>
                         </div>
                     }
                     else if (field.FieldType == "Slider")
                     {
                         <div style="width: @inputWidth; touch-action: none; user-select: none;" draggable="true" @ref="draggableElement">
+                            <div style="width: @field.DivClass">
+
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 <label for="@field.Id">@field.Name</label>
                                 <input type="range" class="form-control-range" id="@field.Id" @bind="field.Value" min="@field.min" max="@field.max" step="@field.step" />
@@ -340,7 +353,7 @@
                                         <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                             <i class="fa-solid fa-grip"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => CreateElement(field.Name))">
+                                        <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                             <i class="fa-solid fa-copy"></i>
                                         </button>
                                         <button type="button" class="btn btn-outline-danger btn-sm" @onclick="(() => OnRemove(field.Id))">
@@ -348,6 +361,7 @@
                                         </button>
                                     </div>
                                 }
+                            </div>
                             </div>
                         </div>
 
@@ -373,28 +387,29 @@
             </div>
             <div class="row w-100 mt-4 text-start ">
                 <span class="">Size Of Field</span>
-                <div class="btn-group col-md-12" role="group" aria-label="Basic radio toggle button group">
+                <div class="btn-group col-md-12" role="group">
                     <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
-                    <label class="btn btn-sm btn-outline-primary" for="btnradio1">Large</label>
+                    <label class="btn btn-sm btn-outline-primary" for="btnradio1" @onclick="(() => SetWidth(1))">Large</label>
 
                     <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
-                    <label class="btn btn-sm btn-outline-primary" for="btnradio2">Default</label>
+                            <label class="btn btn-sm btn-outline-primary" for="btnradio2" @onclick="(() => SetWidth(2))">Default</label>
 
                     <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                    <label class="btn btn-sm btn-outline-primary" for="btnradio3">Small</label>
+                            <label class="btn btn-sm btn-outline-primary" for="btnradio3" @onclick="(() => SetWidth(3))">Small</label>
                 </div>
             </div>
             <div class="row w-100 mt-4">
                 <span>label Alignment</span>
-                <div class="col-md-4 p-0">
-                    <img src="~/_content/FormGenerator/images/no-img.png" alt="No Image" class="w-img">
-                </div>
-                <div class="col-md-4 p-0">
-                    <img src="no-img.png" alt="No Image" class="w-img">
-                </div>
-                <div class="col-md-4 p-0">
-                    <img src="no-img.png" alt="No Image" class="w-img">
-                </div>
+                        <div class="btn-group col-md-12" role="group">
+                            <input type="radio" class="btn-check" name="btnlabel" id="btnradio4" autocomplete="off">
+                            <label class="btn btn-sm btn-outline-primary" for="btnradio4" @onclick="(() => SetLabel(4))">Flex</label>
+
+                            <input type="radio" class="btn-check" name="btnlabel" id="btnradio5" autocomplete="off" checked>
+                            <label class="btn btn-sm btn-outline-primary" for="btnradio5" @onclick="(() => SetLabel(5))">Align</label>
+
+                            <input type="radio" class="btn-check" name="btnlabel" id="btnradio6" autocomplete="off">
+                            <label class="btn btn-sm btn-outline-primary" for="btnradio6" @onclick="(() => SetLabel(6))">Left</label>
+                        </div>
             </div>
             <div class="button-div mt-3 mx-2">
                 <span>Button</span>
@@ -442,12 +457,12 @@
                             @* @onchange="UpdatePlaceHolder" *@
                         </div>
                         <div class="w-100 d-flex">
-                            <button class="btn btn-sm btn-outline-light mx-1 w-40px">1/4</button>
-                            <button class="btn btn-sm btn-outline-light w-40px">1/3</button>
-                            <button class="btn btn-sm btn-outline-light mx-1 w-40px">1/2</button>
-                            <button class="btn btn-sm btn-outline-light w-40px">2/3</button>
-                            <button class="btn btn-sm btn-outline-light mx-1 w-40px">3/4</button>
-                            <button class="btn btn-sm btn-outline-light w-40px">1</button>
+                            <button class="btn btn-sm btn-outline-light mx-1 w-40px" @onclick="(() => SetDivWidth(20))">1/4</button>
+                            <button class="btn btn-sm btn-outline-light w-40px" @onclick="(() => SetDivWidth(30))">1/3</button>
+                            <button class="btn btn-sm btn-outline-light mx-1 w-40px" @onclick="(() => SetDivWidth(40))">1/2</button>
+                            <button class="btn btn-sm btn-outline-light w-40px" @onclick="(() => SetDivWidth(60))">2/3</button>
+                            <button class="btn btn-sm btn-outline-light mx-1 w-40px" @onclick="(() => SetDivWidth(80))">3/4</button>
+                            <button class="btn btn-sm btn-outline-light w-40px" @onclick="(() => SetDivWidth(100))">1</button>
                         </div>
 
                         <div class="pt-2 pb-2">
@@ -472,6 +487,30 @@
             }
         </div>
        
+    </div>
+
+</div>
+
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal">JSON</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" @onclick="CloseModal"></button>
+            </div>
+            <div class="modal-body modal_body p-3">
+                @if (@JsonData != "[]")
+                {
+                    @JsonData
+                } else
+                {
+                    <p>No Data Found...!</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class=" btn btn-sm btn-outline-secondary" @onclick="CopyText">Copy JSON</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -522,6 +561,84 @@
     private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
     private int inputFieldCount = 1;
     private string inputWidth = "100%";
+    private string inputGroupSize = "form-control";
+
+    private void SetDivWidth(int width)
+    {
+        foreach (var item in fields)
+        {
+            if (item.Class.Contains("selected"))
+            {
+                
+            if(width == 20)
+            {
+                item.DivClass = "20%";
+            }
+            else if (width == 30)
+            {
+                item.DivClass = "30%";
+            }
+            else if (width == 40)
+            {
+                item.DivClass = "40%";
+            }
+            else if (width == 60)
+            {
+                item.DivClass = "60%";
+            }
+            else if (width == 80)
+            {
+                item.DivClass = "80%";
+            }
+            else if (width == 100)
+            {
+                item.DivClass = "100%";
+            }
+            }
+        }
+    }
+
+    private void SetLabel(int labelVal)
+    {
+        foreach(var item in fields)
+        {   
+            if (labelVal == 4)
+        {
+                item.Class = "p-2 form-group mb-2";
+        }
+        else if (labelVal == 5)
+        {
+                item.Class = "p-2 form-group mb-2 label-align";
+        }
+            else if (labelVal == 6)
+        {
+                item.Class = "p-2 form-group mb-2 label-center";
+        }
+        }
+    }
+
+    private void SetWidth(int val)
+    {
+        if(val == 1)
+        {
+            inputGroupSize = "form-control form-control-lg";
+        } else if (val == 2)
+        {
+            inputGroupSize = "form-control";
+        } else if (val == 3)
+        {
+            inputGroupSize = "form-control form-control-sm";
+        }
+    }
+
+    private void DuplicateElement(string currentId)
+    {
+        var obj = fields.FirstOrDefault(x => x.Id == currentId);
+        if (obj != null)
+        {
+            fields.Add(new InputModel { Id = $"dup_{obj.Id}", Name = $"{obj.Name}", Class = $"{obj.Class}", Type = $"{obj.Type}", Actions = false, Value = $"{obj.Value}", FieldType = $"{obj.FieldType}", DivClass = "100%" });
+        }
+    }
 
     private void setDisplay(bool display)
     {
@@ -544,20 +661,40 @@
 
     private void onAction(string currentId)
     {
-        var currentObj = fields.FirstOrDefault(o => o.Id == currentId);
-        if (!currentObj.Class.Contains("selected"))
+        foreach (var item in fields)
         {
-            currentObj.Class = "selected mx-2 p-2 form-group";
-            currentObj.Actions = true;
-            IsSelect = true;
-            panelLst.Add(new Panel { id = currentId, title = currentObj.Name, content = currentObj.Value, placeholder = currentObj.Name, clearable = true, disabled = false, required = false, trim = false, width = 100 });
+            if (item.Id != currentId)
+            {
+                item.Class = "p-2 mx-2 form-group mb-2";
+                item.Actions = false;
+                var panelObj = panelLst.FirstOrDefault(b => b.id == item.Id);
+                if (panelObj != null)
+                {
+                    panelLst.Remove(panelObj);
+                }
+            }
+            else
+            {
+                if (!item.Class.Contains("selected"))
+                {
+                    item.Class = "selected mx-2 p-2 form-group";
+                    item.Actions = true;
+                    panelLst.Add(new Panel { id = item.Id, title = item.Name, content = item.Value, placeholder = item.Name, clearable = true, disabled = false, required = false, trim = false, width = 100 });
+                }
+                else
+                {
+                    item.Class = "p-2 mx-2 form-group mb-2";
+                    item.Actions = false;
+                    panelLst.Clear();
+                }
+            }
         }
-        else
+        if(panelLst.Count() > 0)
         {
-            currentObj.Class = "p-2 mx-2 form-group mb-2";
-            currentObj.Actions = false;
+            IsSelect = true;
+        } else
+        {
             IsSelect = false;
-            panelLst.Clear();
         }
     }
 
@@ -583,55 +720,55 @@
             switch (elementName)
             {
                 case "Email":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input", DivClass = "100%" });
                     break;
                 case "Phone":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input", DivClass = "100%" });
                     break;
                 case "URL":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input", DivClass = "100%" });
                     break;
                 case "Region":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input", DivClass = "100%" });
                     break;
                 case "Id":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input", DivClass = "100%" });
                     break;
                 case "Input":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input", DivClass = "100%" });
                     break;
                 case "Number":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input", DivClass = "100%" });
                     break;
                 case "Radio":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio", DivClass = "100%" });
                     break;
                 case "Checkbox":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox", DivClass = "100%" });
                     break;
                 case "TextArea":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea", DivClass = "100%" });
                     break;
                 case "Time":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "Select Time", FieldType = "time" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "Select Time", FieldType = "time", DivClass = "100%" });
                     break;
                 case "Date":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "date", Actions = false, Value = "Select Date", FieldType = "date" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "date", Actions = false, Value = "Select Date", FieldType = "date", DivClass = "100%" });
                     break;                    
                 case "Select":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "select", Actions = false, Value = "Select", FieldType = "select" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "select", Actions = false, Value = "Select", FieldType = "select", DivClass = "100%" });
                     break;
                 case "File":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "file", Actions = false, Value = "Upload a file", FieldType = "file" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "file", Actions = false, Value = "Upload a file", FieldType = "file", DivClass = "100%" });
                     break;
                 case "Rate":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Rate", Actions = false, Value = "", FieldType = "Rate" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Rate", Actions = false, Value = "", FieldType = "Rate", DivClass = "100%" });
                     break;
                 case "Switch":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Switch", Actions = false, Value = "", FieldType = "Switch" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Switch", Actions = false, Value = "", FieldType = "Switch", DivClass = "100%" });
                     break;
                 case "Slider":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Slider", Actions = false, Value = "", FieldType = "Slider" });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "Slider", Actions = false, Value = "", FieldType = "Slider", DivClass = "100%" });
                     break;
             }
         }
@@ -673,11 +810,12 @@
             data.Value = e.Value.ToString();
         }
     }
+
     public string JsonData { get; set; } = string.Empty;
 
     private void GenerateJson()
     {
-        JsonCls JsonFields = new JsonCls(); // Assuming you have defined the InputField class as shown in the previous example
+        JsonCls JsonFields = new JsonCls();
         List<JsonCls> lst = new List<JsonCls>();
         foreach (var item in fields)
         {
@@ -703,18 +841,22 @@
             }
             lst.Add(JsonFields);
         }
-        
         JsonData = JsonSerializer.Serialize(lst, new JsonSerializerOptions { WriteIndented = true });
     }
 
-    // private void UpdatePlaceHolder(ChangeEventArgs e)
-    // {
-    //     var data = fields.Find(x => x.Class.Contains("selected"));
-    //     if (data != null)
-    //     {
-    //         data.P = e.Value.ToString();
-    //     }
-    // }
+    private async void OpenModal()
+    {
+        GenerateJson();
+        await JSRuntime.InvokeVoidAsync("openModal");
+    }
 
+    private async void CloseModal()
+    {
+        await JSRuntime.InvokeVoidAsync("closeModal");
+    }
 
+    private void CopyText()
+    {
+        JSRuntime.InvokeVoidAsync("copyToClipboard", JsonData);
+    }
 }
