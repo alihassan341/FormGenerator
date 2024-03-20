@@ -127,7 +127,7 @@
     display: flex !important;
 }
 
-    .label-align input {
+    .label-align span {
         width: 80px !important;
     }
 
@@ -136,6 +136,6 @@
     text-align: center !important;
 }
 
-    .label-center input {
+    .label-center span {
         width: 80px !important;
     }

@@ -5,7 +5,9 @@
 @using System.Text.Json
 
 <div class="d-flex h-100 w-100">
-    <div class="left-menu overflow-auto h-100">
+    @if (!IsFullScreen)
+    {
+        <div class="left-menu overflow-auto h-100">
         <div class="accordion w-100" id="defaultAccordion">
             <div class="accordion-item">
                 <h2 class="accordion-header">
@@ -69,13 +71,16 @@
             </div>
         </div>
     </div>
+    }
 
-    <div class="content w-64 p-0 overflow-auto">
+    <div class="@contentScreen">
       <div class="row d-flex align-items-center border-b-black p-2 w-100">
         <div class="col-md-4 f-s-12">
             <i class="fa-solid fa-brush text-light mx-1 pointer" @onclick="AllRemove"></i>
-@*             <i class="fa-brands fa-squarespace text-light pointer"></i>
-            <span class="mx-2 mb-0 text-danger">Layout: 2</span> *@
+                @if (IsFullScreen)
+                {
+                    <span @onclick="RemoveFullScreen" class="pointer">Back To Panel</span>
+                }
         </div>
         
         <div class="col-md-4 text-center">
@@ -92,8 +97,8 @@
         <div class="col-md-4 f-s-12 text-end">
                 <span class="mx-2 mb-0 text-info pointer" @onclick="OpenModal">Generate JSON</span>
 
-@*             <i class="fa-solid fa-font text-light mx-1 pointer"></i>
-            <i class="fa-regular fa-eye text-light pointer"></i> *@
+                @*             <i class="fa-solid fa-font text-light mx-1 pointer"></i> *@
+            <i class="fa-regular fa-eye text-light pointer" @onclick="FullScreen"></i> 
         </div>
     </div>
     <div class="d-flex justify-content-center">
@@ -105,7 +110,7 @@
                     <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
                             <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
-                            <label for="@field.Id">@field.Name :</label>
+                            <span >@field.Name :</span>
                             <input type="@field.Type" class="@inputGroupSize" id="@field.Id" @bind="field.Value"/>
                         @if (field.Actions)
                         {
@@ -180,7 +185,7 @@
                         <div style="width: @inputWidth; touch-action :none; user-select = none" draggable="true" @ref="draggableElement">
                             <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
-                                <label for="@field.Id">@field.Name</label>
+                                    <span>@field.Name :</span>
                                 <textarea class="@inputGroupSize" id="@field.Id" rows="3" @bind="@field.Value"></textarea>
                                 @if (field.Actions)
                                 {
@@ -205,7 +210,7 @@
                         <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
                             <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
-                                <label for="@field.Id">@field.Name</label>
+                                    <span>@field.Name :</span>
                                 <input class="@inputGroupSize" type="@field.Type" @bind="field.Value" id="@field.Id">
                                 @if (field.Actions)
                                 {
@@ -230,7 +235,7 @@
                         <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
                             <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
-                                <label for="@field.Id">@field.Name</label>
+                                    <span>@field.Name :</span>
                                 <input class="@inputGroupSize" type="@field.Type" @bind="field.Value" id="@field.Id">
                                 @if (field.Actions)
                                 {
@@ -371,7 +376,9 @@
     </div>
 </div>
 
-    <div class="setting">
+    @if (!IsFullScreen)
+    {
+        <div class="setting">
         <div class="w-100 f-s-12 px-3 pt-2 pb-2 text-white">
             <span>Form Attribute</span>
             @if (!IsSelect)
@@ -401,10 +408,10 @@
             <div class="row w-100 mt-4">
                 <span>label Alignment</span>
                         <div class="btn-group col-md-12" role="group">
-                            <input type="radio" class="btn-check" name="btnlabel" id="btnradio4" autocomplete="off">
+                                <input type="radio" class="btn-check" name="btnlabel" id="btnradio4" autocomplete="off" checked>
                             <label class="btn btn-sm btn-outline-primary" for="btnradio4" @onclick="(() => SetLabel(4))">Flex</label>
 
-                            <input type="radio" class="btn-check" name="btnlabel" id="btnradio5" autocomplete="off" checked>
+                            <input type="radio" class="btn-check" name="btnlabel" id="btnradio5" autocomplete="off">
                             <label class="btn btn-sm btn-outline-primary" for="btnradio5" @onclick="(() => SetLabel(5))">Align</label>
 
                             <input type="radio" class="btn-check" name="btnlabel" id="btnradio6" autocomplete="off">
@@ -488,6 +495,7 @@
         </div>
        
     </div>
+    }
 
 </div>
 
@@ -557,11 +565,25 @@
     List<Panel> panelLst = new List<Panel>();
 
     private bool IsSelect = false;
+    private bool IsFullScreen = false;
     private ElementReference draggableElement;
     private string displayClasses = "h-88vh mt-3 overflow-auto w-100";
     private int inputFieldCount = 1;
     private string inputWidth = "100%";
     private string inputGroupSize = "form-control";
+    private string contentScreen = "content w-64 p-0 overflow-auto";
+
+    private void FullScreen()
+    {
+        IsFullScreen = true;
+        contentScreen = "content w-100 p-0 overflow-auto";
+    }
+
+    private void RemoveFullScreen()
+    {
+        IsFullScreen = false;
+        contentScreen = "content w-64 p-0 overflow-auto";
+    }
 
     private void SetDivWidth(int width)
     {
@@ -608,11 +630,11 @@
         }
         else if (labelVal == 5)
         {
-                item.Class = "p-2 form-group mb-2 label-align";
+                item.Class = "p-2 form-group label-align mb-2";
         }
             else if (labelVal == 6)
         {
-                item.Class = "p-2 form-group mb-2 label-center";
+                item.Class = "p-2 form-group label-center mb-2";
         }
         }
     }
