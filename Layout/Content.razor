@@ -105,7 +105,7 @@
                 {
                     @if(field.FieldType == "input")
                     {
-                    <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="true" @ref="draggableElement">
+                    <div style="width: @inputWidth; touch-action :none; user-select = none;" draggable="@field.drag" @ref="draggableElement">
                             <div style="width: @field.DivClass">
                             <div class="@field.Class, resize-handle" @onclick="(() => onAction(field.Id))">
                                 @if(field.Required == true)
@@ -115,13 +115,13 @@
                                     {
                                         <span>@field.Name :</span>
                                     }
-                                    <input type="@field.Type" class="@inputGroupSize" id="@field.Id" @bind="field.Value" required="@field.Required" disabled="@field.Disabled"/>
+                                    <input type="@field.Type" placeholder="@field.placeholder" class="@inputGroupSize" id="@field.Id" @bind="field.Value" required="@field.Required" disabled="@field.Disabled"/>
                         @if (field.Actions)
                         {
                             <div class="d-flex align-items-ceneter justify-content-end pt-2">
-                                    <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
+                @*                     <button type="button" class="btn btn-outline-light btn-sm" @onclick="DragDrop">
                                     <i class="fa-solid fa-grip"></i>
-                                </button>
+                                </button> *@
                                         <button type="button" class="btn btn-outline-info btn-sm mx-3" @onclick="(() => DuplicateElement(field.Id))">
                                     <i class="fa-solid fa-copy"></i>
                                 </button>
@@ -464,7 +464,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="@item.placeholder" class="form-label">Place Holder</label>
-                            <input type="text" class="form-control form-control-sm" id="@item.placeholder" placeholder="@item.placeholder" value="@item.placeholder">
+                                <input type="text" class="form-control form-control-sm" id="@item.placeholder" placeholder="@item.placeholder" value="@item.placeholder" @onchange="UpdatePlaceHolder">
                             @* @onchange="UpdatePlaceHolder" *@
                         </div>
                         <div class="w-100 d-flex">
@@ -477,8 +477,8 @@
                         </div>
 
                         <div class="pt-2 pb-2">
-                            <input class="form-check-input" type="checkbox" id="trim">
-                            <label class="form-check-label" for="trim">Trim</label>
+                                <input class="form-check-input" type="checkbox" id="trim" value="@item.trim" @onchange="UpdateTrimCheck">
+                                <label class="form-check-label" for="trim" >Trim</label>
                         </div>
                         <div class="pb-2">
                                 <input class="form-check-input" type="checkbox" id="required" value="@item.required" @onchange="UpdateReqCheck">
@@ -489,8 +489,8 @@
                             <label class="form-check-label" for="disabled">Disabled</label>
                         </div>
                         <div class="pb-2">
-                            <input class="form-check-input" type="checkbox" id="clearable">
-                            <label class="form-check-label" for="clearable">Clearable</label>
+                                <input class="form-check-input" type="checkbox" id="clearable" value="@item.clearable" @onchange="UpdateClearCheck">
+                                <label class="form-check-label" for="clearable" >Clearable</label>
                         </div>
 
                     </div>
@@ -584,6 +584,28 @@
             if (item.Class.Contains("selected"))
             {
                 item.Required = (bool)e?.Value;
+            }
+        }
+    }
+
+    private void UpdateTrimCheck(ChangeEventArgs e)
+    {
+        foreach (var item in fields)
+        {
+            if (item.Class.Contains("selected"))
+            {
+                item.trim = (bool)e?.Value;
+            }
+        }
+    }
+
+    private void UpdateClearCheck(ChangeEventArgs e)
+    {
+        foreach (var item in fields)
+        {
+            if (item.Class.Contains("selected"))
+            {
+                item.clearable = (bool)e?.Value;
             }
         }
     }
@@ -684,8 +706,8 @@
         var obj = fields.FirstOrDefault(x => x.Id == currentId);
         if (obj != null)
         {
-            fields.Add(new InputModel { Id = $"dup_{obj.Id}", Name = $"{obj.Name}", Class = $"{obj.Class}", Type = $"{obj.Type}", Actions = false, Value = $"{obj.Value}", FieldType = $"{obj.FieldType}", DivClass = "100%", Required = obj.Required, Disabled = obj.Disabled });
-    }
+            fields.Add(new InputModel { Id = $"dup_{obj.Id}", Name = $"{obj.Name}", Class = $"{obj.Class}", Type = $"{obj.Type}", Actions = false, Value = $"{obj.Value}", FieldType = $"{obj.FieldType}", DivClass = "100%", Required = obj.Required, Disabled = obj.Disabled, placeholder = obj.placeholder });
+        }
     }
 
     private void setDisplay(bool display)
@@ -715,6 +737,8 @@
             {
                 item.Class = "p-2 mx-2 form-group mb-2";
                 item.Actions = false;
+                item.drag = false;
+                draggableElement = default;
                 var panelObj = panelLst.FirstOrDefault(b => b.id == item.Id);
                 if (panelObj != null)
                 {
@@ -727,12 +751,17 @@
                 {
                     item.Class = "selected mx-2 p-2 form-group";
                     item.Actions = true;
-                    panelLst.Add(new Panel { id = item.Id, title = item.Name, content = item.Value, placeholder = item.Name, clearable = true, disabled = item.Disabled, required = item.Required, trim = false, width = 100 });
+                    item.drag = true;
+                    //draggableElement = new ElementReference();
+                    panelLst.Add(new Panel { id = item.Id, title = item.Name, content = item.Value, placeholder = item.placeholder, clearable = item.clearable, disabled = item.Disabled, required = item.Required, trim = item.trim, width = 100 });
+                    DragDrop();
                 }
                 else
                 {
                     item.Class = "p-2 mx-2 form-group mb-2";
                     item.Actions = false;
+                    item.drag = false;
+                    draggableElement = default;
                     panelLst.Clear();
                 }
             }
@@ -768,37 +797,37 @@
             switch (elementName)
             {
                 case "Email":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "email", Actions = false, Value = "abc.123@gmail.com", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test", trim = false, clearable = false, drag = false });
                     break;
                 case "Phone":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input", DivClass = "100%", Required = false,Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "0312-4690876", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test", trim = false, clearable = false, drag = false });
                     break;
                 case "URL":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "www.google.com", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test", trim = false, clearable = false, drag = false });
                     break;
                 case "Region":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input", DivClass = "100%", Required = false,Disabled = false  });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Islam", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test", trim = false, clearable = false, drag = false });
                     break;
                 case "Id":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "001", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "Input":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "text", Actions = false, Value = "Type...", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "Number":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "number", Actions = false, Value = "13000", FieldType = "input", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "Radio":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio", DivClass = "100%",Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-group mb-2", Type = "radio", Actions = false, Value = "", FieldType = "radio", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "Checkbox":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "", FieldType = "checkbox", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "TextArea":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea", DivClass = "100%", Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "checkbox", Actions = false, Value = "Hey...! nice to meet you.", FieldType = "textarea", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "Time":
-                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "Select Time", FieldType = "time", DivClass = "100%",Required = false, Disabled = false });
+                    fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "time", Actions = false, Value = "Select Time", FieldType = "time", DivClass = "100%", Required = false, Disabled = false, placeholder = "Test" });
                     break;
                 case "Date":
                     fields.Add(new InputModel { Id = $"emp{inputFieldCount++}", Name = elementName, Class = "p-2 form-check mb-2", Type = "date", Actions = false, Value = "Select Date", FieldType = "date", DivClass = "100%",Required = false, Disabled = false });
@@ -824,7 +853,18 @@
 
     private async void DragDrop ( )
     {
-        await JSRuntime.InvokeVoidAsync("initializeDragAndDrop", draggableElement);
+        foreach (var item in fields)
+        {
+            if (item.Class.Contains("selected"))
+            {
+                item.drag = true;
+                draggableElement = new ElementReference();
+                await JSRuntime.InvokeVoidAsync("initializeDragAndDrop", draggableElement);
+            } else
+            {
+                item.drag = false;
+            }
+        }
     }
 
     private void UpdateWidth(MouseEventArgs e)
@@ -859,6 +899,15 @@
         }
     }
 
+    private void UpdatePlaceHolder(ChangeEventArgs e)
+    {
+        var data = fields.Find(x => x.Class.Contains("selected"));
+        if (data != null)
+        {
+            data.placeholder = e.Value.ToString();
+        }
+    }
+
     public string JsonData { get; set; } = string.Empty;
 
     private void GenerateJson()
@@ -870,23 +919,20 @@
             JsonFields = new JsonCls();
             JsonFields.Label = item.Name;
             JsonFields.Icon = item.Name;
-            JsonFields.Key = item.Name;//Need to Assign correct Value
-            JsonFields.Id = item.Name;
-            foreach (var item1 in panelLst)
-            {
-                JsonFields.Options.Clearable = item1.clearable;
-                JsonFields.Options.RenderType = 4;                
-                JsonFields.Options.Disabled = item1.disabled;
-                JsonFields.Options.ShowPassword = item1.showpassword;
-                JsonFields.Options.DefaultValue = item1.defaultValue;
-                JsonFields.Options.Placeholder = item1.placeholder;
-                JsonFields.Options.LabelWidth = item1.labelWidth;
-                JsonFields.Options.Required = item1.required;
-                JsonFields.Options.IsShowLabel = item1.isshowlable;
-                JsonFields.Options.IsShowTrim = item1.trim;
-                JsonFields.Style.Width.PC = item1.PC;
-                JsonFields.Style.Width.Mobile = item1.Mobile;
-            }
+            JsonFields.Key = item.Id;
+            JsonFields.Id = item.Id;
+            JsonFields.Style.Width.PC = "50";//item.PC;
+            JsonFields.Style.Width.Mobile = "100";//item1.Mobile;
+            JsonFields.Options.Disabled = item.Disabled;
+            JsonFields.Options.Required = item.Required;
+            JsonFields.Options.DefaultValue = item.Value;
+            JsonFields.Options.RenderType = 4;          
+            JsonFields.Options.Clearable = item.clearable;
+            JsonFields.Options.ShowPassword = item.showpassword;
+            JsonFields.Options.Placeholder = item.placeholder;
+            JsonFields.Options.LabelWidth = 80;//item.labelWidth;
+            JsonFields.Options.IsShowTrim = item.trim;
+           
             lst.Add(JsonFields);
         }
         JsonData = JsonSerializer.Serialize(lst, new JsonSerializerOptions { WriteIndented = true });

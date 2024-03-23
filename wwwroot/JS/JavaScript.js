@@ -1,4 +1,5 @@
 ﻿window.initializeDragAndDrop = function (element) {
+    //if (!element || element == null) return;
     interact(element).draggable({
         listeners: {
             start(event) {

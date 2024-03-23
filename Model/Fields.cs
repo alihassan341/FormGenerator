@@ -18,6 +18,15 @@ namespace FormGenerator.Model
         public string? DivClass { get; set; } = "";
         public bool Disabled { get; set; } = false;
         public bool Required { get; set; } = false;
+        public bool clearable { get; set; }
+        public bool showpassword { get; set; }
+        public string placeholder { get; set; }
+        public bool trim { get; set; }
+
+        public bool drag { get; set; }
+
+
+
     }
 
     public class JsonCls
