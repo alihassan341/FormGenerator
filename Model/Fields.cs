@@ -5,7 +5,6 @@ namespace FormGenerator.Model
     public class InputModel
     {
         private IList<InputModel> options;
-
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
         public string Value { get; set; } = "";
@@ -17,6 +16,8 @@ namespace FormGenerator.Model
         public int step { get; set; } = 1;
         public int max { get; set; } = 100;
         public string? DivClass { get; set; } = "";
+        public bool Disabled { get; set; } = false;
+        public bool Required { get; set; } = false;
     }
 
     public class JsonCls
